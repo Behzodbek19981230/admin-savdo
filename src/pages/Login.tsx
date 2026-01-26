@@ -27,7 +27,7 @@ const loginSchema = z.object({
         .min(3, "Username kamida 3 ta belgidan iborat bo'lishi kerak")
         .max(50, "Username juda uzun"),
     password: z.string()
-        .min(6, "Parol kamida 6 ta belgidan iborat bo'lishi kerak")
+        .min(4, "Parol kamida 4 ta belgidan iborat bo'lishi kerak")
         .max(100, "Parol juda uzun"),
     rememberMe: z.boolean().default(false),
 });
