@@ -13,3 +13,7 @@ export * from './productModel.service';
 export * from './modelSize.service';
 export * from './modelType.service';
 export * from './product.service';
+export * from './productImage.service';
+export * from './role.service';
+export * from './user.service';
+export * from './company.service';

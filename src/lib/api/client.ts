@@ -32,6 +32,18 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // FormData bo'lsa Content-Type ni majburlab qo'ymaslik kerak
+    // (axios boundary'ni o'zi qo'shadi)
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      if (config.headers) {
+        // axios v1 da headers object yoki AxiosHeaders bo'lishi mumkin
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const headers: any = config.headers;
+        delete headers['Content-Type'];
+        delete headers['content-type'];
+      }
+    }
     
     // Request log (development mode)
     if (import.meta.env.DEV) {

@@ -11,6 +11,7 @@ import { AuthLayout } from "@/components/layouts/AuthLayout";
 import Index from "./pages/Index";
 import Customers from "./pages/Customers";
 import Products from "./pages/Products";
+import ProductShow from "./pages/ProductShow";
 import Locations from "./pages/Locations";
 import ProductCategories from "./pages/ProductCategories";
 import ProductModels from "./pages/ProductModels";
@@ -18,6 +19,9 @@ import ModelSizes from "./pages/ModelSizes";
 import ModelTypes from "./pages/ModelTypes";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Roles from "./pages/Roles";
+import Users from "./pages/Users";
+import Companies from "./pages/Companies";
 
 // React Query client configuration
 const queryClient = new QueryClient({
@@ -49,6 +53,10 @@ const protectedRoutes = [
         element: <Products />,
     },
     {
+        path: "/products/:id",
+        element: <ProductShow />,
+    },
+    {
         path: "/locations",
         element: <Locations />,
     },
@@ -67,6 +75,18 @@ const protectedRoutes = [
     {
         path: "/model-types",
         element: <ModelTypes />,
+    },
+    {
+        path: "/role",
+        element: <Roles />,
+    },
+    {
+        path: "/user",
+        element: <Users />,
+    },
+    {
+        path: "/company",
+        element: <Companies />,
     },
 ];
 

@@ -27,6 +27,35 @@ export const API_ENDPOINTS = {
     update: (id: string) => `/users/${id}`,
     delete: (id: string) => `/users/${id}`,
   },
+
+  // Role endpoints
+  roles: {
+    list: '/role',
+    byId: (id: string) => `/role/${id}`,
+    create: '/role',
+    update: (id: string) => `/role/${id}`,
+    delete: (id: string) => `/role/${id}`,
+  },
+
+  // App User endpoints (admin users)
+  // NOTE: Frontend route: /user, backend endpoint: /user
+  appUsers: {
+    list: '/user',
+    byId: (id: string) => `/user/${id}`,
+    create: '/user',
+    update: (id: string) => `/user/${id}`,
+    delete: (id: string) => `/user/${id}`,
+  },
+
+  // Company endpoints
+  // NOTE: Frontend route: /company, backend endpoint: /company
+  companies: {
+    list: '/company',
+    byId: (id: string) => `/company/${id}`,
+    create: '/company',
+    update: (id: string) => `/company/${id}`,
+    delete: (id: string) => `/company/${id}`,
+  },
   
   // Customer endpoints
   customers: {
@@ -56,6 +85,16 @@ export const API_ENDPOINTS = {
     update: (id: string) => `/product/${id}`,
     delete: (id: string) => `/product/${id}`,
     top: '/products/top',
+  },
+
+  // Product Image endpoints
+  // NOTE: Backend endpoint nomi shu bo'lishi kerak: /product-image
+  productImages: {
+    list: '/product-image',
+    byId: (id: string) => `/product-image/${id}`,
+    create: '/product-image',
+    update: (id: string) => `/product-image/${id}`,
+    delete: (id: string) => `/product-image/${id}`,
   },
   
   // Analytics endpoints
