@@ -74,6 +74,15 @@ export const API_ENDPOINTS = {
     regionById: (id: string) => `/region/${id}`,
     districtById: (id: string) => `/district/${id}`,
   },
+  
+  // Product Category endpoints
+  productCategories: {
+    list: '/product-category',
+    byId: (id: string) => `/product-category/${id}`,
+    create: '/product-category',
+    update: (id: string) => `/product-category/${id}`,
+    delete: (id: string) => `/product-category/${id}`,
+  },
 } as const;
 
 // Request timeout (milliseconds)

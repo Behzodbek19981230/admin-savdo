@@ -8,7 +8,7 @@ import { API_ENDPOINTS } from '@/lib/api/config';
 
 // Types
 export interface Country {
-  id: string;
+  id: number;
   code: string;
   name: string;
   geo_json?: string;
@@ -17,7 +17,7 @@ export interface Country {
 }
 
 export interface Region {
-  id: string;
+  id: number;
   code: string;
   name: string;
   geo_json?: string;
@@ -26,26 +26,32 @@ export interface Region {
 }
 
 export interface District {
-  id: string;
+  id: number;
   code: string;
   name: string;
-  region?: string ;
+  region?: string | number;
   region_detail?: Region;
   geo_json?: string;
   created_at?: string;
   updated_at?: string;
 }
 
+export interface PaginationMeta {
+  currentPage: number;
+  lastPage: number;
+  perPage: number;
+  total: number;
+}
+
 export interface LocationListResponse<T> {
-  count: number;
-  next: string | null;
-  previous: string | null;
+  pagination: PaginationMeta;
   results: T[];
+  filters: unknown;
 }
 
 export interface LocationQueryParams {
   page?: number;
-  page_size?: number;
+  perPage?: number;
   search?: string;
   ordering?: string;
 }
@@ -59,20 +65,20 @@ export const locationService = {
     });
   },
 
-  getCountryById: async (id: string) => {
-    return api.get<Country>(API_ENDPOINTS.locations.countryById(id));
+  getCountryById: async (id: number) => {
+    return api.get<Country>(API_ENDPOINTS.locations.countryById(id.toString()));
   },
 
   createCountry: async (data: Partial<Country>) => {
     return api.post<Country>(API_ENDPOINTS.locations.countries, data);
   },
 
-  updateCountry: async (id: string, data: Partial<Country>) => {
-    return api.patch<Country>(API_ENDPOINTS.locations.countryById(id), data);
+  updateCountry: async (id: number, data: Partial<Country>) => {
+    return api.patch<Country>(API_ENDPOINTS.locations.countryById(id.toString()), data);
   },
 
-  deleteCountry: async (id: string) => {
-    return api.delete(API_ENDPOINTS.locations.countryById(id));
+  deleteCountry: async (id: number) => {
+    return api.delete(API_ENDPOINTS.locations.countryById(id.toString()));
   },
 
   // Regions
@@ -82,20 +88,20 @@ export const locationService = {
     });
   },
 
-  getRegionById: async (id: string) => {
-    return api.get<Region>(API_ENDPOINTS.locations.regionById(id));
+  getRegionById: async (id: number) => {
+    return api.get<Region>(API_ENDPOINTS.locations.regionById(id.toString()));
   },
 
   createRegion: async (data: Partial<Region>) => {
     return api.post<Region>(API_ENDPOINTS.locations.regions, data);
   },
 
-  updateRegion: async (id: string, data: Partial<Region>) => {
-    return api.patch<Region>(API_ENDPOINTS.locations.regionById(id), data);
+  updateRegion: async (id: number, data: Partial<Region>) => {
+    return api.patch<Region>(API_ENDPOINTS.locations.regionById(id.toString()), data);
   },
 
-  deleteRegion: async (id: string) => {
-    return api.delete(API_ENDPOINTS.locations.regionById(id));
+  deleteRegion: async (id: number) => {
+    return api.delete(API_ENDPOINTS.locations.regionById(id.toString()));
   },
 
   // Districts
@@ -105,19 +111,19 @@ export const locationService = {
     });
   },
 
-  getDistrictById: async (id: string) => {
-    return api.get<District>(API_ENDPOINTS.locations.districtById(id));
+  getDistrictById: async (id: number) => {
+    return api.get<District>(API_ENDPOINTS.locations.districtById(id.toString()));
   },
 
   createDistrict: async (data: Partial<District>) => {
     return api.post<District>(API_ENDPOINTS.locations.districts, data);
   },
 
-  updateDistrict: async (id: string, data: Partial<District>) => {
-    return api.patch<District>(API_ENDPOINTS.locations.districtById(id), data);
+  updateDistrict: async (id: number, data: Partial<District>) => {
+    return api.patch<District>(API_ENDPOINTS.locations.districtById(id.toString()), data);
   },
 
-  deleteDistrict: async (id: string) => {
-    return api.delete(API_ENDPOINTS.locations.districtById(id));
+  deleteDistrict: async (id: number) => {
+    return api.delete(API_ENDPOINTS.locations.districtById(id.toString()));
   },
 };

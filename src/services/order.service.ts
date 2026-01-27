@@ -43,7 +43,7 @@ export interface CreateOrderData {
   status?: 'completed' | 'pending' | 'cancelled';
 }
 
-export interface UpdateOrderData extends Partial<CreateOrderData> {}
+export type UpdateOrderData = Partial<CreateOrderData>;
 
 // Order Service
 export const orderService = {

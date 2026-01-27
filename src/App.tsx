@@ -11,6 +11,7 @@ import { AuthLayout } from "@/components/layouts/AuthLayout";
 import Index from "./pages/Index";
 import Customers from "./pages/Customers";
 import Locations from "./pages/Locations";
+import ProductCategories from "./pages/ProductCategories";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -42,6 +43,10 @@ const protectedRoutes = [
     {
         path: "/locations",
         element: <Locations />,
+    },
+    {
+        path: "/product-categories",
+        element: <ProductCategories />,
     },
 ];
 

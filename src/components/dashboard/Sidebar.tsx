@@ -16,7 +16,8 @@ import {
     Star,
     FileText,
     LogOut,
-    LocateIcon
+    LocateIcon,
+    Layers
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -77,6 +78,7 @@ const navSections: NavSection[] = [
         title: "KATALOG",
         items: [
             { icon: LocateIcon, label: "Hududlar", path: "/locations" },
+            { icon: Layers, label: "Mahsulot turlari", path: "/product-categories" },
         ]
     }
 ];

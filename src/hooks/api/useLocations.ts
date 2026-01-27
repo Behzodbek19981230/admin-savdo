@@ -7,19 +7,55 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { locationService, type LocationQueryParams, type Country, type Region, type District } from '@/services/location.service';
 import { toast } from '@/hooks/use-toast';
 
+// Helper function to format error messages
+const formatErrorMessage = (error: unknown): string => {
+  const err = error as Record<string, unknown>;
+  
+  // Check if error has message object with field errors
+  if (err.message && typeof err.message === 'object') {
+    const fieldErrors: string[] = [];
+    
+    Object.entries(err.message).forEach(([, messages]) => {
+      if (Array.isArray(messages)) {
+        messages.forEach((msg) => {
+          fieldErrors.push(String(msg));
+        });
+      } else if (typeof messages === 'string') {
+        fieldErrors.push(messages);
+      }
+    });
+    
+    if (fieldErrors.length > 0) {
+      return fieldErrors.join('\n');
+    }
+  }
+  
+  // Check if error has errorMessage
+  if (err.errorMessage && typeof err.errorMessage === 'string') {
+    return err.errorMessage;
+  }
+  
+  // Check if error has message string
+  if (typeof err.message === 'string') {
+    return err.message;
+  }
+  
+  return 'Xatolik yuz berdi';
+};
+
 // Query Keys
 export const LOCATION_KEYS = {
   countries: ['countries'] as const,
   countriesList: (params?: LocationQueryParams) => [...LOCATION_KEYS.countries, 'list', params] as const,
-  countryDetail: (id: string) => [...LOCATION_KEYS.countries, 'detail', id] as const,
+  countryDetail: (id: number) => [...LOCATION_KEYS.countries, 'detail', id] as const,
   
   regions: ['regions'] as const,
   regionsList: (params?: LocationQueryParams) => [...LOCATION_KEYS.regions, 'list', params] as const,
-  regionDetail: (id: string) => [...LOCATION_KEYS.regions, 'detail', id] as const,
+  regionDetail: (id: number) => [...LOCATION_KEYS.regions, 'detail', id] as const,
   
   districts: ['districts'] as const,
   districtsList: (params?: LocationQueryParams) => [...LOCATION_KEYS.districts, 'list', params] as const,
-  districtDetail: (id: string) => [...LOCATION_KEYS.districts, 'detail', id] as const,
+  districtDetail: (id: number) => [...LOCATION_KEYS.districts, 'detail', id] as const,
 };
 
 // ==================== COUNTRIES ====================
@@ -37,7 +73,7 @@ export function useCountries(params?: LocationQueryParams) {
 /**
  * Bitta mamlakatni olish
  */
-export function useCountry(id: string) {
+export function useCountry(id: number) {
   return useQuery({
     queryKey: LOCATION_KEYS.countryDetail(id),
     queryFn: () => locationService.getCountryById(id),
@@ -60,10 +96,11 @@ export function useCreateCountry() {
         description: 'Mamlakat qo\'shildi',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = formatErrorMessage(error);
       toast({
         title: 'Xatolik!',
-        description: error.message || 'Mamlakat qo\'shishda xatolik yuz berdi',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -77,7 +114,7 @@ export function useUpdateCountry() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Country> }) => 
+    mutationFn: ({ id, data }: { id: number; data: Partial<Country> }) => 
       locationService.updateCountry(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: LOCATION_KEYS.countries });
@@ -87,10 +124,11 @@ export function useUpdateCountry() {
         description: 'Mamlakat yangilandi',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = formatErrorMessage(error);
       toast({
         title: 'Xatolik!',
-        description: error.message || 'Mamlakatni yangilashda xatolik yuz berdi',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -104,7 +142,7 @@ export function useDeleteCountry() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (id: string) => locationService.deleteCountry(id),
+    mutationFn: (id: number) => locationService.deleteCountry(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: LOCATION_KEYS.countries });
       toast({
@@ -112,10 +150,11 @@ export function useDeleteCountry() {
         description: 'Mamlakat o\'chirildi',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = formatErrorMessage(error);
       toast({
         title: 'Xatolik!',
-        description: error.message || 'Mamlakatni o\'chirishda xatolik yuz berdi',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -137,7 +176,7 @@ export function useRegions(params?: LocationQueryParams) {
 /**
  * Bitta viloyatni olish
  */
-export function useRegion(id: string) {
+export function useRegion(id: number) {
   return useQuery({
     queryKey: LOCATION_KEYS.regionDetail(id),
     queryFn: () => locationService.getRegionById(id),
@@ -160,10 +199,11 @@ export function useCreateRegion() {
         description: 'Viloyat qo\'shildi',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = formatErrorMessage(error);
       toast({
         title: 'Xatolik!',
-        description: error.message || 'Viloyat qo\'shishda xatolik yuz berdi',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -177,7 +217,7 @@ export function useUpdateRegion() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Region> }) => 
+    mutationFn: ({ id, data }: { id: number; data: Partial<Region> }) => 
       locationService.updateRegion(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: LOCATION_KEYS.regions });
@@ -187,10 +227,11 @@ export function useUpdateRegion() {
         description: 'Viloyat yangilandi',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = formatErrorMessage(error);
       toast({
         title: 'Xatolik!',
-        description: error.message || 'Viloyatni yangilashda xatolik yuz berdi',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -212,10 +253,11 @@ export function useDeleteRegion() {
         description: 'Viloyat o\'chirildi',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = formatErrorMessage(error);
       toast({
         title: 'Xatolik!',
-        description: error.message || 'Viloyatni o\'chirishda xatolik yuz berdi',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -237,7 +279,7 @@ export function useDistricts(params?: LocationQueryParams) {
 /**
  * Bitta tumanni olish
  */
-export function useDistrict(id: string) {
+export function useDistrict(id: number) {
   return useQuery({
     queryKey: LOCATION_KEYS.districtDetail(id),
     queryFn: () => locationService.getDistrictById(id),
@@ -260,10 +302,11 @@ export function useCreateDistrict() {
         description: 'Tuman qo\'shildi',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = formatErrorMessage(error);
       toast({
         title: 'Xatolik!',
-        description: error.message || 'Tuman qo\'shishda xatolik yuz berdi',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -277,7 +320,7 @@ export function useUpdateDistrict() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<District> }) => 
+    mutationFn: ({ id, data }: { id: number; data: Partial<District> }) => 
       locationService.updateDistrict(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: LOCATION_KEYS.districts });
@@ -287,10 +330,11 @@ export function useUpdateDistrict() {
         description: 'Tuman yangilandi',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = formatErrorMessage(error);
       toast({
         title: 'Xatolik!',
-        description: error.message || 'Tumanni yangilashda xatolik yuz berdi',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -312,10 +356,11 @@ export function useDeleteDistrict() {
         description: 'Tuman o\'chirildi',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = formatErrorMessage(error);
       toast({
         title: 'Xatolik!',
-        description: error.message || 'Tumanni o\'chirishda xatolik yuz berdi',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
