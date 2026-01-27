@@ -76,7 +76,7 @@ const navSections: NavSection[] = [
     {
         title: "KATALOG",
         items: [
-            { icon: LocateIcon, label: "Hududlar", path: "/regions" },
+            { icon: LocateIcon, label: "Hududlar", path: "/locations" },
         ]
     }
 ];

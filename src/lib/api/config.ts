@@ -64,6 +64,16 @@ export const API_ENDPOINTS = {
     revenue: '/analytics/revenue',
     sales: '/analytics/sales',
   },
+  
+  // Location endpoints
+  locations: {
+    countries: '/country',
+    regions: '/region',
+    districts: '/district',
+    countryById: (id: string) => `/country/${id}`,
+    regionById: (id: string) => `/region/${id}`,
+    districtById: (id: string) => `/district/${id}`,
+  },
 } as const;
 
 // Request timeout (milliseconds)

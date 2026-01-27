@@ -6,7 +6,7 @@ import { DollarSign, Users, ShoppingCart, TrendingUp } from "lucide-react";
 
 const Index = () => {
     return (
-        <div className="p-4 lg:p-6 space-y-4 lg:space-y-5">
+        <div>
             {/* Stats Grid */}
             <div className="grid gap-3 lg:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 <StatCard

@@ -10,6 +10,7 @@ import { DashboardLayout } from "@/components/layouts/DashboardLayout";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import Index from "./pages/Index";
 import Customers from "./pages/Customers";
+import Locations from "./pages/Locations";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -37,6 +38,10 @@ const protectedRoutes = [
     {
         path: "/customers",
         element: <Customers />,
+    },
+    {
+        path: "/locations",
+        element: <Locations />,
     },
 ];
 
