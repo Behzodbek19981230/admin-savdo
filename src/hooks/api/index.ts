@@ -8,3 +8,7 @@ export * from './useOrders';
 export * from './useAnalytics';
 export * from './useLocations';
 export * from './useProductCategories';
+export * from './useProductModels';
+export * from './useModelSizes';
+export * from './useModelTypes';
+export * from './useProducts';

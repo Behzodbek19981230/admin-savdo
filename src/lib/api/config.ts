@@ -50,11 +50,11 @@ export const API_ENDPOINTS = {
   
   // Product endpoints
   products: {
-    list: '/products',
-    byId: (id: string) => `/products/${id}`,
-    create: '/products',
-    update: (id: string) => `/products/${id}`,
-    delete: (id: string) => `/products/${id}`,
+    list: '/product',
+    byId: (id: string) => `/product/${id}`,
+    create: '/product',
+    update: (id: string) => `/product/${id}`,
+    delete: (id: string) => `/product/${id}`,
     top: '/products/top',
   },
   
@@ -82,6 +82,33 @@ export const API_ENDPOINTS = {
     create: '/product-category',
     update: (id: string) => `/product-category/${id}`,
     delete: (id: string) => `/product-category/${id}`,
+  },
+  
+  // Product Model endpoints
+  productModels: {
+    list: '/model',
+    byId: (id: string) => `/model/${id}`,
+    create: '/model',
+    update: (id: string) => `/model/${id}`,
+    delete: (id: string) => `/model/${id}`,
+  },
+  
+  // Model Size endpoints
+  modelSizes: {
+    list: '/model-size',
+    byId: (id: string) => `/model-size/${id}`,
+    create: '/model-size',
+    update: (id: string) => `/model-size/${id}`,
+    delete: (id: string) => `/model-size/${id}`,
+  },
+  
+  // Model Type endpoints
+  modelTypes: {
+    list: '/model-type',
+    byId: (id: string) => `/model-type/${id}`,
+    create: '/model-type',
+    update: (id: string) => `/model-type/${id}`,
+    delete: (id: string) => `/model-type/${id}`,
   },
 } as const;
 

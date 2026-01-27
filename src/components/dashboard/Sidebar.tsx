@@ -17,7 +17,10 @@ import {
     FileText,
     LogOut,
     LocateIcon,
-    Layers
+    Layers,
+    Ruler,
+    Tag,
+    Box
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -50,6 +53,7 @@ const navSections: NavSection[] = [
         title: "ASOSIY",
         items: [
             { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+            { icon: Package, label: "Mahsulotlar", path: "/products" },
             // { icon: ShoppingCart, label: "Buyurtmalar", path: "/orders", badge: "4" },
             // { icon: TrendingUp, label: "Sotuvlar", path: "/sales" },
             // { icon: Users, label: "Mijozlar", path: "/customers" },
@@ -79,6 +83,9 @@ const navSections: NavSection[] = [
         items: [
             { icon: LocateIcon, label: "Hududlar", path: "/locations" },
             { icon: Layers, label: "Mahsulot turlari", path: "/product-categories" },
+            { icon: Box, label: "Mahsulot modellari", path: "/product-models" },
+            { icon: Ruler, label: "Model o'lchamlari", path: "/model-sizes" },
+            { icon: Tag, label: "Model turlari", path: "/model-types" },
         ]
     }
 ];

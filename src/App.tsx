@@ -10,8 +10,12 @@ import { DashboardLayout } from "@/components/layouts/DashboardLayout";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import Index from "./pages/Index";
 import Customers from "./pages/Customers";
+import Products from "./pages/Products";
 import Locations from "./pages/Locations";
 import ProductCategories from "./pages/ProductCategories";
+import ProductModels from "./pages/ProductModels";
+import ModelSizes from "./pages/ModelSizes";
+import ModelTypes from "./pages/ModelTypes";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -41,12 +45,28 @@ const protectedRoutes = [
         element: <Customers />,
     },
     {
+        path: "/products",
+        element: <Products />,
+    },
+    {
         path: "/locations",
         element: <Locations />,
     },
     {
         path: "/product-categories",
         element: <ProductCategories />,
+    },
+    {
+        path: "/product-models",
+        element: <ProductModels />,
+    },
+    {
+        path: "/model-sizes",
+        element: <ModelSizes />,
+    },
+    {
+        path: "/model-types",
+        element: <ModelTypes />,
     },
 ];
 
