@@ -3,7 +3,7 @@
  * Kategoriya bo'yicha mahsulotlarni qo'shish dialogi
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -42,17 +42,20 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { Plus, Trash2, Loader2, Package } from 'lucide-react';
-import { Badge } from '../ui/badge';
-import { ArrowLeft } from 'lucide-react';
-import { Edit } from 'lucide-react';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import { Plus, Trash2, Loader2, Edit } from 'lucide-react';
 import { useProductCategories } from '@/hooks/api/useProductCategories';
 import { useProductModels } from '@/hooks/api/useProductModels';
 import { useModelTypes } from '@/hooks/api/useModelTypes';
 import { useModelSizes } from '@/hooks/api/useModelSizes';
-import { useCreateProduct } from '@/hooks/api/useProducts';
-import { DialogDescription } from '@radix-ui/react-dialog';
-import { Card, CardContent } from '../ui/card';
+import { useCreateProduct, useProducts } from '@/hooks/api/useProducts';
 
 interface AddProductsDialogProps {
     open: boolean;
@@ -77,11 +80,10 @@ interface ProductItem extends ProductItemFormData {
 }
 
 export function AddProductsDialog({ open, onOpenChange }: AddProductsDialogProps) {
-    const [step, setStep] = useState<'category' | 'products'>('category');
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
     const [products, setProducts] = useState<ProductItem[]>([]);
     const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
-    const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
+    const [isAddingNew, setIsAddingNew] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -107,12 +109,27 @@ export function AddProductsDialog({ open, onOpenChange }: AddProductsDialogProps
         is_delete: false,
     });
 
+    // Fetch products filtered by category
+    const { data: existingProductsData, isLoading: isLoadingProducts } = useProducts({
+        category: selectedCategory || undefined,
+        perPage: 1000,
+        is_delete: false,
+    });
+
     const createProduct = useCreateProduct();
 
     const categories = categoriesData?.results || [];
     const models = modelsData?.results || [];
     const modelTypes = modelTypesData?.results || [];
     const modelSizes = modelSizesData?.results || [];
+    const existingProducts = existingProductsData?.results || [];
+
+    // Set default category when dialog opens
+    useEffect(() => {
+        if (open && categoriesData?.results && categoriesData.results.length > 0 && !selectedCategory) {
+            setSelectedCategory(categoriesData.results[0].id);
+        }
+    }, [open, categoriesData?.results, selectedCategory]);
 
     // Form for product item
     const form = useForm<ProductItemFormData>({
@@ -128,46 +145,45 @@ export function AddProductsDialog({ open, onOpenChange }: AddProductsDialogProps
         },
     });
 
-    const handleCategorySelect = (categoryId: number) => {
-        setSelectedCategory(categoryId);
-        setStep('products');
-    };
-
-    const handleBack = () => {
-        setStep('category');
-        setSelectedCategory(null);
+    const handleCategoryChange = (categoryId: string) => {
+        const id = parseInt(categoryId);
+        setSelectedCategory(id);
+        // Clear manually added products when category changes
         setProducts([]);
+        setIsAddingNew(false);
+        setEditingProduct(null);
     };
 
-    const handleOpenItemDialog = (item?: ProductItem) => {
-        if (item) {
-            setEditingProduct(item);
-            form.reset({
-                model: item.model,
-                model_type: item.model_type,
-                model_size: item.model_size,
-                count: item.count,
-                real_price: item.real_price,
-                price: item.price,
-                sorting: item.sorting,
-            });
-        } else {
-            setEditingProduct(null);
-            form.reset({
-                model: 0,
-                model_type: 0,
-                model_size: 0,
-                count: 0,
-                real_price: 0,
-                price: 0,
-                sorting: null,
-            });
-        }
-        setIsItemDialogOpen(true);
+    const handleAddNew = () => {
+        setIsAddingNew(true);
+        setEditingProduct(null);
+        form.reset({
+            model: 0,
+            model_type: 0,
+            model_size: 0,
+            count: 0,
+            real_price: 0,
+            price: 0,
+            sorting: null,
+        });
     };
 
-    const handleCloseItemDialog = () => {
-        setIsItemDialogOpen(false);
+    const handleEditItem = (item: ProductItem) => {
+        setIsAddingNew(false);
+        setEditingProduct(item);
+        form.reset({
+            model: item.model,
+            model_type: item.model_type,
+            model_size: item.model_size,
+            count: item.count,
+            real_price: item.real_price,
+            price: item.price,
+            sorting: item.sorting,
+        });
+    };
+
+    const handleCancelEdit = () => {
+        setIsAddingNew(false);
         setEditingProduct(null);
         form.reset();
     };
@@ -184,7 +200,7 @@ export function AddProductsDialog({ open, onOpenChange }: AddProductsDialogProps
             };
             setProducts([...products, newItem]);
         }
-        handleCloseItemDialog();
+        handleCancelEdit();
     };
 
     const handleDeleteItem = (id: string) => {
@@ -229,10 +245,10 @@ export function AddProductsDialog({ open, onOpenChange }: AddProductsDialogProps
     };
 
     const handleClose = () => {
-        setStep('category');
         setSelectedCategory(null);
         setProducts([]);
         setEditingProduct(null);
+        setIsAddingNew(false);
         onOpenChange(false);
     };
 
@@ -255,344 +271,324 @@ export function AddProductsDialog({ open, onOpenChange }: AddProductsDialogProps
     return (
         <>
             <Dialog open={open} onOpenChange={handleClose}>
-                <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
+                <DialogContent className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>
-                            {step === 'category' ? 'Kategoriya tanlang' : 'Mahsulotlar qo\'shish'}
-                        </DialogTitle>
-                        <DialogDescription>
-                            {step === 'category'
-                                ? 'Mahsulot qo\'shish uchun kategoriyani tanlang'
-                                : `${categories.find(c => c.id === selectedCategory)?.name} kategoriyasi uchun mahsulotlar`}
-                        </DialogDescription>
+                        <DialogTitle>Mahsulotlar qo'shish</DialogTitle>
                     </DialogHeader>
 
-                    {step === 'category' ? (
-                        <div className="grid gap-3 py-4">
-                            {categories.map((category) => (
-                                <Card
-                                    key={category.id}
-                                    className="cursor-pointer hover:bg-accent transition-colors"
-                                    onClick={() => handleCategorySelect(category.id)}
+                    <div className="space-y-4">
+                        {/* Category Select */}
+                        <div className="flex items-end gap-4">
+                            <div className="flex-1">
+                                <label className="text-sm font-medium mb-2 block">
+                                    Kategoriya *
+                                </label>
+                                <Select
+                                    value={selectedCategory?.toString()}
+                                    onValueChange={handleCategoryChange}
                                 >
-                                    <CardContent className="flex items-center justify-between p-4">
-                                        <div className="flex items-center gap-3">
-                                            <Package className="h-5 w-5 text-primary" />
-                                            <div>
-                                                <p className="font-medium">{category.name}</p>
-                                                {category.sorting && (
-                                                    <p className="text-sm text-muted-foreground">
-                                                        Tartib: {category.sorting}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <Badge variant="secondary">Tanlash</Badge>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <Button variant="ghost" size="sm" onClick={handleBack}>
-                                    <ArrowLeft className="h-4 w-4 mr-2" />
-                                    Orqaga
-                                </Button>
-                                <Button onClick={() => handleOpenItemDialog()}>
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Mahsulot qo'shish
-                                </Button>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Kategoriyani tanlang" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {categories.map((category) => (
+                                            <SelectItem key={category.id} value={category.id.toString()}>
+                                                {category.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
-
-                            {products.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-8 text-center border rounded-lg">
-                                    <Package className="h-12 w-12 text-muted-foreground/50 mb-3" />
-                                    <p className="text-muted-foreground">Mahsulotlar yo'q</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        Mahsulot qo'shish tugmasini bosing
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    {products.map((product) => (
-                                        <Card key={product.id}>
-                                            <CardContent className="p-4">
-                                                <div className="flex items-start justify-between gap-4">
-                                                    <div className="flex-1 grid grid-cols-2 gap-3 text-sm">
-                                                        <div>
-                                                            <span className="text-muted-foreground">Model:</span>
-                                                            <p className="font-medium">{getModelName(product.model)}</p>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-muted-foreground">Model turi:</span>
-                                                            <p className="font-medium">{getModelTypeName(product.model_type)}</p>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-muted-foreground">Model o'lchami:</span>
-                                                            <p className="font-medium">{getModelSizeName(product.model_size)}</p>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-muted-foreground">Soni:</span>
-                                                            <p className="font-medium">{product.count}</p>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-muted-foreground">Haqiqiy narx:</span>
-                                                            <p className="font-medium">{formatPrice(product.real_price)}</p>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-muted-foreground">Sotuv narxi:</span>
-                                                            <p className="font-medium text-green-600">{formatPrice(product.price)}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => handleOpenItemDialog(product)}
-                                                        >
-                                                            <Edit className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => handleDeleteItem(product.id)}
-                                                        >
-                                                            <Trash2 className="h-4 w-4 text-destructive" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
-                            )}
-
-                            <div className="flex justify-end gap-2 pt-4 border-t">
-                                <Button variant="outline" onClick={handleClose}>
-                                    Bekor qilish
-                                </Button>
-                                <Button
-                                    onClick={handleSaveAll}
-                                    disabled={products.length === 0 || isSaving}
-                                >
-                                    {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Hammasini saqlash ({products.length})
-                                </Button>
-                            </div>
+                            <Button
+                                onClick={handleAddNew}
+                                disabled={!selectedCategory || isAddingNew || editingProduct !== null}
+                            >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Mahsulot qo'shish
+                            </Button>
                         </div>
-                    )}
-                </DialogContent>
-            </Dialog>
 
-            {/* Product Item Dialog */}
-            <Dialog open={isItemDialogOpen} onOpenChange={handleCloseItemDialog}>
-                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmitItem)}>
-                            <DialogHeader>
-                                <DialogTitle>
-                                    {editingProduct ? 'Mahsulotni tahrirlash' : 'Yangi mahsulot'}
-                                </DialogTitle>
-                                <DialogDescription>
-                                    Mahsulot ma'lumotlarini kiriting
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="model"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Model *</FormLabel>
-                                                <Select
-                                                    onValueChange={(value) => field.onChange(parseInt(value))}
-                                                    value={field.value?.toString()}
-                                                >
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Tanlang" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {models.map((model) => (
-                                                            <SelectItem key={model.id} value={model.id.toString()}>
-                                                                {model.name}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="model_type"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Model turi *</FormLabel>
-                                                <Select
-                                                    onValueChange={(value) => field.onChange(parseInt(value))}
-                                                    value={field.value?.toString()}
-                                                >
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Tanlang" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {modelTypes.map((modelType) => (
-                                                            <SelectItem
-                                                                key={modelType.id}
-                                                                value={modelType.id.toString()}
-                                                            >
-                                                                {modelType.name}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
+                        {/* Products Table */}
+                        <div className="border rounded-lg">
+                            <Form {...form}>
+                                <form onSubmit={form.handleSubmit(onSubmitItem)}>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Model</TableHead>
+                                                <TableHead>Model turi</TableHead>
+                                                <TableHead>Model o'lchami</TableHead>
+                                                <TableHead>Soni</TableHead>
+                                                <TableHead>Haqiqiy narx (so'mda)</TableHead>
+                                                <TableHead>Sotuv narxi (so'mda)</TableHead>
+                                                <TableHead className="w-[140px]">Amallar</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {isLoadingProducts ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={7} className="text-center py-8">
+                                                        <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : (
+                                                <>
+                                                    {/* Add/Edit Form Row */}
+                                                    {(isAddingNew || editingProduct) && (
+                                                        <TableRow className="bg-blue-50 dark:bg-blue-950">
+                                                            <TableCell>
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name="model"
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <Select
+                                                                                onValueChange={(value) => field.onChange(parseInt(value))}
+                                                                                value={field.value?.toString()}
+                                                                            >
+                                                                                <FormControl>
+                                                                                    <SelectTrigger className="h-9">
+                                                                                        <SelectValue placeholder="Tanlang" />
+                                                                                    </SelectTrigger>
+                                                                                </FormControl>
+                                                                                <SelectContent>
+                                                                                    {models.map((model) => (
+                                                                                        <SelectItem key={model.id} value={model.id.toString()}>
+                                                                                            {model.name}
+                                                                                        </SelectItem>
+                                                                                    ))}
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name="model_type"
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <Select
+                                                                                onValueChange={(value) => field.onChange(parseInt(value))}
+                                                                                value={field.value?.toString()}
+                                                                            >
+                                                                                <FormControl>
+                                                                                    <SelectTrigger className="h-9">
+                                                                                        <SelectValue placeholder="Tanlang" />
+                                                                                    </SelectTrigger>
+                                                                                </FormControl>
+                                                                                <SelectContent>
+                                                                                    {modelTypes.map((modelType) => (
+                                                                                        <SelectItem key={modelType.id} value={modelType.id.toString()}>
+                                                                                            {modelType.name}
+                                                                                        </SelectItem>
+                                                                                    ))}
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name="model_size"
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <Select
+                                                                                onValueChange={(value) => field.onChange(parseInt(value))}
+                                                                                value={field.value?.toString()}
+                                                                            >
+                                                                                <FormControl>
+                                                                                    <SelectTrigger className="h-9">
+                                                                                        <SelectValue placeholder="Tanlang" />
+                                                                                    </SelectTrigger>
+                                                                                </FormControl>
+                                                                                <SelectContent>
+                                                                                    {modelSizes.map((modelSize) => (
+                                                                                        <SelectItem key={modelSize.id} value={modelSize.id.toString()}>
+                                                                                            {modelSize.size}
+                                                                                        </SelectItem>
+                                                                                    ))}
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name="count"
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <FormControl>
+                                                                                <Input
+                                                                                    type="number"
+                                                                                    placeholder="0"
+                                                                                    className="h-9"
+                                                                                    {...field}
+                                                                                    onChange={(e) => {
+                                                                                        const value = e.target.value;
+                                                                                        field.onChange(value === '' ? 0 : parseInt(value));
+                                                                                    }}
+                                                                                />
+                                                                            </FormControl>
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name="real_price"
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <FormControl>
+                                                                                <Input
+                                                                                    type="number"
+                                                                                    placeholder="0"
+                                                                                    className="h-9"
+                                                                                    {...field}
+                                                                                    onChange={(e) => {
+                                                                                        const value = e.target.value;
+                                                                                        field.onChange(value === '' ? 0 : parseFloat(value));
+                                                                                    }}
+                                                                                />
+                                                                            </FormControl>
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name="price"
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <FormControl>
+                                                                                <Input
+                                                                                    type="number"
+                                                                                    placeholder="0"
+                                                                                    className="h-9"
+                                                                                    {...field}
+                                                                                    onChange={(e) => {
+                                                                                        const value = e.target.value;
+                                                                                        field.onChange(value === '' ? 0 : parseFloat(value));
+                                                                                    }}
+                                                                                />
+                                                                            </FormControl>
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <div className="flex gap-1">
+                                                                    <Button type="submit" size="sm" className="h-9">
+                                                                        Saqlash
+                                                                    </Button>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="h-9"
+                                                                        onClick={handleCancelEdit}
+                                                                    >
+                                                                        Bekor
+                                                                    </Button>
+                                                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    )}
 
-                                <FormField
-                                    control={form.control}
-                                    name="model_size"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Model o'lchami *</FormLabel>
-                                            <Select
-                                                onValueChange={(value) => field.onChange(parseInt(value))}
-                                                value={field.value?.toString()}
-                                            >
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Tanlang" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {modelSizes.map((modelSize) => (
-                                                        <SelectItem
-                                                            key={modelSize.id}
-                                                            value={modelSize.id.toString()}
-                                                        >
-                                                            {modelSize.size}
-                                                        </SelectItem>
+                                                    {/* Empty State */}
+                                                    {!isAddingNew && !editingProduct && existingProducts.length === 0 && products.length === 0 && (
+                                                        <TableRow>
+                                                            <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                                                {selectedCategory
+                                                                    ? 'Mahsulotlar yo\'q. "Mahsulot qo\'shish" tugmasini bosing.'
+                                                                    : 'Kategoriyani tanlang va mahsulot qo\'shing.'}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    )}
+
+                                                    {/* Existing products from API */}
+                                                    {existingProducts.map((product) => (
+                                                        <TableRow key={`existing-${product.id}`} className="bg-muted/30">
+                                                            <TableCell className="font-medium">
+                                                                {product.model_detail?.name || '-'}
+                                                            </TableCell>
+                                                            <TableCell>{product.model_type_detail?.name || '-'}</TableCell>
+                                                            <TableCell>{product.model_size_detail?.size || '-'}</TableCell>
+                                                            <TableCell>{product.count}</TableCell>
+                                                            <TableCell>{formatPrice(product.real_price)}</TableCell>
+                                                            <TableCell className="text-green-600 font-medium">
+                                                                {formatPrice(product.price)}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <span className="text-xs text-muted-foreground">
+                                                                    Mavjud
+                                                                </span>
+                                                            </TableCell>
+                                                        </TableRow>
                                                     ))}
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="count"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Soni *</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="10"
-                                                        {...field}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value;
-                                                            field.onChange(value === '' ? 0 : parseInt(value));
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="sorting"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Tartib raqami</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="1"
-                                                        {...field}
-                                                        value={field.value ?? ''}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value;
-                                                            field.onChange(value === '' ? null : parseInt(value));
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
+                                                    {/* Newly added products */}
+                                                    {products.map((product) => (
+                                                        <TableRow key={product.id}>
+                                                            <TableCell className="font-medium">
+                                                                {getModelName(product.model)}
+                                                            </TableCell>
+                                                            <TableCell>{getModelTypeName(product.model_type)}</TableCell>
+                                                            <TableCell>{getModelSizeName(product.model_size)}</TableCell>
+                                                            <TableCell>{product.count}</TableCell>
+                                                            <TableCell>{formatPrice(product.real_price)}</TableCell>
+                                                            <TableCell className="text-green-600 font-medium">
+                                                                {formatPrice(product.price)}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <div className="flex gap-2">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => handleEditItem(product)}
+                                                                    >
+                                                                        <Edit className="h-4 w-4" />
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => handleDeleteItem(product.id)}
+                                                                    >
+                                                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                                                    </Button>
+                                                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </>
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </form>
+                            </Form>
+                        </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="real_price"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Haqiqiy narx *</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="1000000"
-                                                        {...field}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value;
-                                                            field.onChange(value === '' ? 0 : parseFloat(value));
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormDescription>Tan narxi (so'mda)</FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="price"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Sotuv narxi *</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="1200000"
-                                                        {...field}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value;
-                                                            field.onChange(value === '' ? 0 : parseFloat(value));
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormDescription>Sotish narxi (so'mda)</FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex justify-end gap-2">
-                                <Button type="button" variant="outline" onClick={handleCloseItemDialog}>
-                                    Bekor qilish
-                                </Button>
-                                <Button type="submit">
-                                    {editingProduct ? 'Saqlash' : 'Qo\'shish'}
-                                </Button>
-                            </div>
-                        </form>
-                    </Form>
+                        {/* Footer */}
+                        <DialogFooter>
+                            <Button variant="outline" onClick={handleClose}>
+                                Bekor qilish
+                            </Button>
+                            <Button
+                                onClick={handleSaveAll}
+                                disabled={products.length === 0 || isSaving}
+                            >
+                                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Hammasini saqlash ({products.length})
+                            </Button>
+                        </DialogFooter>
+                    </div>
                 </DialogContent>
             </Dialog>
 
