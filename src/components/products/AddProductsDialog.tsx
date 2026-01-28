@@ -36,17 +36,23 @@ import {
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { Plus, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Loader2, Package } from 'lucide-react';
+import { Badge } from '../ui/badge';
+import { ArrowLeft } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import { useProductCategories } from '@/hooks/api/useProductCategories';
 import { useProductModels } from '@/hooks/api/useProductModels';
 import { useModelTypes } from '@/hooks/api/useModelTypes';
 import { useModelSizes } from '@/hooks/api/useModelSizes';
 import { useCreateProduct } from '@/hooks/api/useProducts';
+import { DialogDescription } from '@radix-ui/react-dialog';
+import { Card, CardContent } from '../ui/card';
 
 interface AddProductsDialogProps {
     open: boolean;
