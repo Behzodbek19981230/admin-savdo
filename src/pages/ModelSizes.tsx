@@ -104,7 +104,6 @@ export default function ModelSizes() {
         defaultValues: {
             model_type: 0,
             size: 0,
-            type: ModelSizeType.DONA,
             sorting: null,
         },
     });
@@ -174,7 +173,6 @@ export default function ModelSizes() {
             form.reset({
                 model_type: item.model_type || 0,
                 size: item.size || 0,
-                type: item.type || ModelSizeType.DONA,
                 sorting: item.sorting,
             });
         } else {
@@ -182,7 +180,6 @@ export default function ModelSizes() {
             form.reset({
                 model_type: 0,
                 size: 0,
-                type: ModelSizeType.DONA,
                 sorting: null,
             });
         }
@@ -200,7 +197,6 @@ export default function ModelSizes() {
             const submitData = {
                 model_type: data.model_type,
                 size: data.size,
-                type: data.type,
                 sorting: data.sorting,
             };
 
@@ -365,6 +361,15 @@ export default function ModelSizes() {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
+                                            <TableHead className="w-[100px]">
+                                                <button
+                                                    className="flex items-center hover:text-foreground transition-colors"
+                                                    onClick={() => handleSort('sorting')}
+                                                >
+                                                    Tartib
+                                                    {getSortIcon('sorting')}
+                                                </button>
+                                            </TableHead>
                                             <TableHead>
                                                 <button
                                                     className="flex items-center hover:text-foreground transition-colors"
@@ -383,24 +388,7 @@ export default function ModelSizes() {
                                                     {getSortIcon('size')}
                                                 </button>
                                             </TableHead>
-                                            <TableHead>
-                                                <button
-                                                    className="flex items-center hover:text-foreground transition-colors"
-                                                    onClick={() => handleSort('type')}
-                                                >
-                                                    Tur
-                                                    {getSortIcon('type')}
-                                                </button>
-                                            </TableHead>
-                                            <TableHead>
-                                                <button
-                                                    className="flex items-center hover:text-foreground transition-colors"
-                                                    onClick={() => handleSort('sorting')}
-                                                >
-                                                    Tartib raqami
-                                                    {getSortIcon('sorting')}
-                                                </button>
-                                            </TableHead>
+
                                             <TableHead>
                                                 <button
                                                     className="flex items-center hover:text-foreground transition-colors"
@@ -416,17 +404,6 @@ export default function ModelSizes() {
                                     <TableBody>
                                         {modelSizes.map((modelSize) => (
                                             <TableRow key={modelSize.id}>
-                                                <TableCell className="font-medium">
-                                                    {getModelTypeName(modelSize.model_type)}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge variant="secondary">{modelSize.size}</Badge>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline">
-                                                        {ModelSizeTypeLabels[modelSize.type]}
-                                                    </Badge>
-                                                </TableCell>
                                                 <TableCell>
                                                     {modelSize.sorting !== null ? (
                                                         <Badge variant="secondary">{modelSize.sorting}</Badge>
@@ -434,6 +411,13 @@ export default function ModelSizes() {
                                                         <span className="text-muted-foreground">-</span>
                                                     )}
                                                 </TableCell>
+                                                <TableCell className="font-medium">
+                                                    {getModelTypeName(modelSize.model_type)}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge variant="secondary">{modelSize.size}</Badge>
+                                                </TableCell>
+
                                                 <TableCell>
                                                     {modelSize.created_at
                                                         ? new Date(modelSize.created_at).toLocaleDateString('uz-UZ')
@@ -558,33 +542,7 @@ export default function ModelSizes() {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="type"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Tur *</FormLabel>
-                                            <Select
-                                                onValueChange={field.onChange}
-                                                value={field.value}
-                                            >
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Tur tanlang" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {Object.entries(ModelSizeTypeLabels).map(([value, label]) => (
-                                                        <SelectItem key={value} value={value}>
-                                                            {label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+
                                 <FormField
                                     control={form.control}
                                     name="sorting"

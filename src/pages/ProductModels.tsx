@@ -373,6 +373,15 @@ export default function ProductModels() {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
+                                            <TableHead className="w-[100px]">
+                                                <button
+                                                    className="flex items-center hover:text-foreground transition-colors"
+                                                    onClick={() => handleSort('sorting')}
+                                                >
+                                                    Tartib
+                                                    {getSortIcon('sorting')}
+                                                </button>
+                                            </TableHead>
                                             <TableHead>
                                                 <button
                                                     className="flex items-center hover:text-foreground transition-colors"
@@ -383,15 +392,6 @@ export default function ProductModels() {
                                                 </button>
                                             </TableHead>
                                             <TableHead>Kategoriyalar</TableHead>
-                                            <TableHead>
-                                                <button
-                                                    className="flex items-center hover:text-foreground transition-colors"
-                                                    onClick={() => handleSort('sorting')}
-                                                >
-                                                    Tartib raqami
-                                                    {getSortIcon('sorting')}
-                                                </button>
-                                            </TableHead>
                                             <TableHead>
                                                 <button
                                                     className="flex items-center hover:text-foreground transition-colors"
@@ -407,6 +407,13 @@ export default function ProductModels() {
                                     <TableBody>
                                         {models.map((model) => (
                                             <TableRow key={model.id}>
+                                                <TableCell>
+                                                    {model.sorting !== null ? (
+                                                        <Badge variant="secondary">{model.sorting}</Badge>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">-</span>
+                                                    )}
+                                                </TableCell>
                                                 <TableCell className="font-medium">{model.name}</TableCell>
                                                 <TableCell>
                                                     <div className="flex flex-wrap gap-1">
@@ -417,13 +424,6 @@ export default function ProductModels() {
                                                         ))}
 
                                                     </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {model.sorting !== null ? (
-                                                        <Badge variant="secondary">{model.sorting}</Badge>
-                                                    ) : (
-                                                        <span className="text-muted-foreground">-</span>
-                                                    )}
                                                 </TableCell>
                                                 <TableCell>
                                                     {model.created_at

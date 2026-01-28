@@ -338,6 +338,15 @@ export default function ProductCategories() {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
+                                            <TableHead className="w-[100px]">
+                                                <button
+                                                    className="flex items-center hover:text-foreground transition-colors"
+                                                    onClick={() => handleSort('sorting')}
+                                                >
+                                                    Tartib
+                                                    {getSortIcon('sorting')}
+                                                </button>
+                                            </TableHead>
                                             <TableHead>
                                                 <button
                                                     className="flex items-center hover:text-foreground transition-colors"
@@ -345,15 +354,6 @@ export default function ProductCategories() {
                                                 >
                                                     Nomi
                                                     {getSortIcon('name')}
-                                                </button>
-                                            </TableHead>
-                                            <TableHead>
-                                                <button
-                                                    className="flex items-center hover:text-foreground transition-colors"
-                                                    onClick={() => handleSort('sorting')}
-                                                >
-                                                    Tartib raqami
-                                                    {getSortIcon('sorting')}
                                                 </button>
                                             </TableHead>
                                             <TableHead>
@@ -371,7 +371,6 @@ export default function ProductCategories() {
                                     <TableBody>
                                         {categories.map((category) => (
                                             <TableRow key={category.id}>
-                                                <TableCell className="font-medium">{category.name}</TableCell>
                                                 <TableCell>
                                                     {category.sorting !== null ? (
                                                         <Badge variant="secondary">{category.sorting}</Badge>
@@ -379,6 +378,7 @@ export default function ProductCategories() {
                                                         <span className="text-muted-foreground">-</span>
                                                     )}
                                                 </TableCell>
+                                                <TableCell className="font-medium">{category.name}</TableCell>
                                                 <TableCell>
                                                     {category.created_at
                                                         ? new Date(category.created_at).toLocaleDateString('uz-UZ')

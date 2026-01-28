@@ -361,6 +361,15 @@ export default function ModelTypes() {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
+                                            <TableHead className="w-[100px]">
+                                                <button
+                                                    className="flex items-center hover:text-foreground transition-colors"
+                                                    onClick={() => handleSort('sorting')}
+                                                >
+                                                    Tartib
+                                                    {getSortIcon('sorting')}
+                                                </button>
+                                            </TableHead>
                                             <TableHead>
                                                 <button
                                                     className="flex items-center hover:text-foreground transition-colors"
@@ -382,15 +391,6 @@ export default function ModelTypes() {
                                             <TableHead>
                                                 <button
                                                     className="flex items-center hover:text-foreground transition-colors"
-                                                    onClick={() => handleSort('sorting')}
-                                                >
-                                                    Tartib raqami
-                                                    {getSortIcon('sorting')}
-                                                </button>
-                                            </TableHead>
-                                            <TableHead>
-                                                <button
-                                                    className="flex items-center hover:text-foreground transition-colors"
                                                     onClick={() => handleSort('created_at')}
                                                 >
                                                     Yaratilgan sana
@@ -403,16 +403,16 @@ export default function ModelTypes() {
                                     <TableBody>
                                         {modelTypes.map((modelType) => (
                                             <TableRow key={modelType.id}>
-                                                <TableCell className="font-medium">{modelType.name}</TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline">{getModelName(modelType.model)}</Badge>
-                                                </TableCell>
                                                 <TableCell>
                                                     {modelType.sorting !== null ? (
                                                         <Badge variant="secondary">{modelType.sorting}</Badge>
                                                     ) : (
                                                         <span className="text-muted-foreground">-</span>
                                                     )}
+                                                </TableCell>
+                                                <TableCell className="font-medium">{modelType.name}</TableCell>
+                                                <TableCell>
+                                                    <Badge variant="outline">{getModelName(modelType.model)}</Badge>
                                                 </TableCell>
                                                 <TableCell>
                                                     {modelType.created_at

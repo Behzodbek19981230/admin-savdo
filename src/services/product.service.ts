@@ -89,6 +89,10 @@ export interface ProductQueryParams {
   search?: string;
   ordering?: string;
   is_delete?: boolean;
+  category?: number;
+  model?: number;
+  model_type?: number;
+  type?: string;
 }
 
 export const productService = {
