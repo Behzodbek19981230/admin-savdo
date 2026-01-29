@@ -66,6 +66,7 @@ import { useModelTypes } from '@/hooks/api/useModelTypes';
 import { useModelSizes } from '@/hooks/api/useModelSizes';
 import { type Product, ProductType, ProductTypeLabels } from '@/services/product.service';
 import { productSchema, type ProductFormData } from '@/lib/validations/product';
+import { ModelSizeTypeLabels } from '@/services';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -115,7 +116,7 @@ export default function Products() {
 	// Queries
 	const { data, isLoading } = useProducts({
 		page: currentPage,
-		perPage: ITEMS_PER_PAGE,
+		limit: ITEMS_PER_PAGE,
 		search: searchQuery || undefined,
 		ordering,
 		is_delete: false,
@@ -136,7 +137,7 @@ export default function Products() {
 	});
 
 	const { data: modelTypesData } = useModelTypes({
-		perPage: 1000,
+		limit: 1000,
 		is_delete: false,
 	});
 
@@ -582,12 +583,8 @@ export default function Products() {
 									<TableHeader>
 										<TableRow>
 											<TableHead className='w-[80px]'>
-												<button
-													className='flex items-center hover:text-foreground transition-colors'
-													onClick={() => handleSort('sorting')}
-												>
+												<button className='flex items-center hover:text-foreground transition-colors'>
 													Tartib
-													{getSortIcon('sorting')}
 												</button>
 											</TableHead>
 											<TableHead>
@@ -634,14 +631,10 @@ export default function Products() {
 										</TableRow>
 									</TableHeader>
 									<TableBody>
-										{products.map((product) => (
+										{products.map((product, index) => (
 											<TableRow key={product.id}>
 												<TableCell>
-													{product.sorting !== null ? (
-														<Badge variant='secondary'>{product.sorting}</Badge>
-													) : (
-														<span className='text-muted-foreground'>-</span>
-													)}
+													{(pagination?.currentPage! - 1) * ITEMS_PER_PAGE + index + 1}
 												</TableCell>
 												<TableCell>
 													<Badge variant='secondary'>
@@ -655,7 +648,8 @@ export default function Products() {
 												<TableCell>{product.model_type_detail?.name || '-'}</TableCell>
 												<TableCell>
 													<Badge variant='outline'>
-														{product.model_size_detail?.size || '-'}
+														{product.model_size_detail?.size || '-'}{' '}
+														{ModelSizeTypeLabels[product.model_size_detail?.type || '']}
 													</Badge>
 												</TableCell>
 

@@ -80,7 +80,7 @@ export default function ModelTypes() {
 	// Queries
 	const { data, isLoading } = useModelTypes({
 		page: currentPage,
-		perPage: ITEMS_PER_PAGE,
+		limit: ITEMS_PER_PAGE,
 		search: searchQuery || undefined,
 		ordering,
 		is_delete: false,
@@ -105,9 +105,13 @@ export default function ModelTypes() {
 	const { data: modelSizesData, isLoading: isModelSizesLoading } = useModelSizes();
 	const createModelSize = useCreateModelSize();
 	const deleteModelSize = useDeleteModelSize();
+	const updateModelSize = useUpdateModelSize();
 
 	const [existingSizes, setExistingSizes] = useState<ModelSize[]>([]);
 	const [newSizes, setNewSizes] = useState<Array<{ size: number; type: ModelSizeType; sorting?: number | null }>>([]);
+	const [editingSizeId, setEditingSizeId] = useState<number | null>(null);
+	const [editingSizeValue, setEditingSizeValue] = useState<number>(0);
+	const [editingSizeType, setEditingSizeType] = useState<ModelSizeType>(ModelSizeType.DONA);
 	const handleSort = (field: SortField) => {
 		if (sortField === field) {
 			if (sortDirection === 'asc') {
@@ -590,29 +594,132 @@ export default function ModelTypes() {
 									<div className='space-y-2'>
 										{existingSizes.map((s) => (
 											<div key={s.id} className='flex items-center gap-2'>
-												<Badge variant='secondary'>
-													{s.size} — {ModelSizeTypeLabels[s.type]}
-												</Badge>
+												{editingSizeId === s.id ? (
+													<div className='w-full grid grid-cols-6 gap-2 items-end'>
+														<div className='col-span-2'>
+															<Input
+																type='number'
+																value={editingSizeValue}
+																onChange={(e) =>
+																	setEditingSizeValue(
+																		e.target.value === ''
+																			? 0
+																			: parseInt(e.target.value, 10),
+																	)
+																}
+															/>
+														</div>
+														<div className='col-span-2'>
+															<Select
+																value={editingSizeType}
+																onValueChange={(v) =>
+																	setEditingSizeType(v as ModelSizeType)
+																}
+															>
+																<FormControl>
+																	<SelectTrigger>
+																		<SelectValue placeholder='Tur' />
+																	</SelectTrigger>
+																</FormControl>
+																<SelectContent>
+																	{Object.entries(ModelSizeTypeLabels).map(
+																		([key, label]) => (
+																			<SelectItem key={key} value={key}>
+																				{label}
+																			</SelectItem>
+																		),
+																	)}
+																</SelectContent>
+															</Select>
+														</div>
 
-												<div className='ml-auto'>
-													<Button
-														variant='ghost'
-														size='icon'
-														type='button'
-														onClick={async () => {
-															try {
-																await deleteModelSize.mutateAsync(s.id);
-																setExistingSizes((prev) =>
-																	prev.filter((x) => x.id !== s.id),
-																);
-															} catch (error) {
-																console.error('Error deleting model size:', error);
-															}
-														}}
-													>
-														<Trash2 className='h-4 w-4 text-destructive' />
-													</Button>
-												</div>
+														<div className='col-span-2 flex items-center gap-2'>
+															<Button
+																type='button'
+																onClick={async () => {
+																	try {
+																		await updateModelSize.mutateAsync({
+																			id: s.id,
+																			data: {
+																				size: editingSizeValue,
+																				type: editingSizeType,
+																				sorting: s.sorting,
+																			},
+																		});
+																		setExistingSizes((prev) =>
+																			prev.map((x) =>
+																				x.id === s.id
+																					? {
+																							...x,
+																							size: editingSizeValue,
+																							type: editingSizeType,
+																						}
+																					: x,
+																			),
+																		);
+																		setEditingSizeId(null);
+																	} catch (error) {
+																		console.error(
+																			'Error updating model size:',
+																			error,
+																		);
+																	}
+																}}
+															>
+																Saqlash
+															</Button>
+															<Button
+																type='button'
+																variant='ghost'
+																onClick={() => setEditingSizeId(null)}
+															>
+																Bekor
+															</Button>
+														</div>
+													</div>
+												) : (
+													<>
+														<Badge variant='secondary'>
+															{s.size} — {ModelSizeTypeLabels[s.type]}
+														</Badge>
+
+														<div className='ml-auto flex items-center gap-2'>
+															<Button
+																variant='ghost'
+																size='icon'
+																type='button'
+																onClick={() => {
+																	setEditingSizeId(s.id);
+																	setEditingSizeValue(s.size);
+																	setEditingSizeType(s.type as ModelSizeType);
+																}}
+															>
+																<Edit className='h-4 w-4' />
+															</Button>
+
+															<Button
+																variant='ghost'
+																size='icon'
+																type='button'
+																onClick={async () => {
+																	try {
+																		await deleteModelSize.mutateAsync(s.id);
+																		setExistingSizes((prev) =>
+																			prev.filter((x) => x.id !== s.id),
+																		);
+																	} catch (error) {
+																		console.error(
+																			'Error deleting model size:',
+																			error,
+																		);
+																	}
+																}}
+															>
+																<Trash2 className='h-4 w-4 text-destructive' />
+															</Button>
+														</div>
+													</>
+												)}
 											</div>
 										))}
 									</div>

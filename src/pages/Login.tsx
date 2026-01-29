@@ -67,7 +67,7 @@ const Login = () => {
 				description: 'Tizimga muvaffaqiyatli kirdingiz.',
 			});
 
-			navigate('/');
+			navigate('/products');
 		} catch (error) {
 			toast({
 				title: 'Xatolik yuz berdi',
@@ -129,7 +129,7 @@ const Login = () => {
 			{/* Main Content */}
 			<div className='relative z-10  max-w-6xl  justify-center items-center'>
 				{/* Right Side - Login Card */}
-				<Card className='max-w-lg    shadow-2xl border-border/50 backdrop-blur-sm bg-card/95'>
+				<Card className='w-full  sm:max-w-lg md:max-w-2xl lg:max-w-3xl shadow-2xl border-border/50 backdrop-blur-sm bg-card/95 p-4 '>
 					<CardHeader className='space-y-1 text-center'>
 						<CardTitle className='text-2xl lg:text-3xl font-bold'>Tizimga kirish</CardTitle>
 					</CardHeader>

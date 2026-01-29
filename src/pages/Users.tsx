@@ -111,7 +111,7 @@ export default function Users() {
 
   const { data, isLoading } = useUsers({
     page: currentPage,
-    perPage: ITEMS_PER_PAGE,
+    limit: ITEMS_PER_PAGE,
     search: searchQuery || undefined,
     ordering,
   });

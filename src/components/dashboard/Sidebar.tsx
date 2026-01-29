@@ -53,7 +53,7 @@ const navSections: NavSection[] = [
 	{
 		title: 'ASOSIY',
 		items: [
-			{ icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+			// { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
 			{ icon: Package, label: 'Mahsulotlar', path: '/products' },
 			// { icon: ShoppingCart, label: "Buyurtmalar", path: "/orders", badge: "4" },
 			// { icon: TrendingUp, label: "Sotuvlar", path: "/sales" },
