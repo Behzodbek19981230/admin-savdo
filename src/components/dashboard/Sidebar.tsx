@@ -85,7 +85,7 @@ const navSections: NavSection[] = [
 			{ icon: LocateIcon, label: 'Hududlar', path: '/locations' },
 			{ icon: Layers, label: 'Mahsulot turlari', path: '/product-categories' },
 			{ icon: Box, label: 'Mahsulot modellari', path: '/product-models' },
-			{ icon: Ruler, label: "Model o'lchamlari", path: '/model-sizes' },
+			// { icon: Ruler, label: "Model o'lchamlari", path: '/model-sizes' },
 			{ icon: Tag, label: 'Model turlari', path: '/model-types' },
 		],
 	},
@@ -144,7 +144,7 @@ function SidebarContent() {
 											'relative flex items-center justify-between gap-2.5 rounded-xl px-2.5 py-2.5 text-[13px] font-medium transition-all duration-150',
 											isActive
 												? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
-												: 'text-sidebar-foreground hover:bg-primary/[0.08] hover:border-primary/[0.12] border border-transparent'
+												: 'text-sidebar-foreground hover:bg-primary/[0.08] hover:border-primary/[0.12] border border-transparent',
 										)}
 									>
 										{isActive && (
@@ -154,7 +154,7 @@ function SidebarContent() {
 											<item.icon
 												className={cn(
 													'h-[18px] w-[18px] flex-shrink-0 opacity-90',
-													isActive && 'opacity-100'
+													isActive && 'opacity-100',
 												)}
 											/>
 											<span className='truncate'>{item.label}</span>
@@ -165,7 +165,7 @@ function SidebarContent() {
 													'min-w-[22px] h-[18px] px-1.5 rounded-full text-[11px] font-extrabold inline-flex items-center justify-center border',
 													isActive
 														? 'bg-white/[0.18] text-white border-white/25'
-														: 'bg-destructive/[0.14] text-destructive border-destructive/25'
+														: 'bg-destructive/[0.14] text-destructive border-destructive/25',
 												)}
 											>
 												{item.badge}
@@ -193,7 +193,7 @@ function SidebarContent() {
 									'relative flex items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-[13px] font-medium transition-all duration-150',
 									isActive
 										? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
-										: 'text-sidebar-foreground hover:bg-primary/[0.08] hover:border-primary/[0.12] border border-transparent'
+										: 'text-sidebar-foreground hover:bg-primary/[0.08] hover:border-primary/[0.12] border border-transparent',
 								)}
 							>
 								<item.icon className='h-[18px] w-[18px] flex-shrink-0 opacity-90' />
