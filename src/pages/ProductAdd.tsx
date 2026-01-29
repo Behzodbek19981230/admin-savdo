@@ -25,6 +25,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { ModelSizeTypeLabels } from '@/services';
 
 // Product item schema
 const productItemSchema = z.object({
@@ -408,7 +409,13 @@ export default function ProductAdd() {
 																									key={modelSize.id}
 																									value={modelSize.id.toString()}
 																								>
-																									{modelSize.size}
+																									{modelSize.size} —{' '}
+																									{
+																										ModelSizeTypeLabels[
+																											modelSize
+																												.type
+																										]
+																									}
 																								</SelectItem>
 																							),
 																						)}
