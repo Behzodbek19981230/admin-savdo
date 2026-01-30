@@ -70,6 +70,7 @@ const productItemSchema = z.object({
     count: z.number({ required_error: 'Soni majburiy' }).int().min(0),
     real_price: z.number({ required_error: 'Haqiqiy narx majburiy' }).min(0),
     price: z.number({ required_error: 'Sotuv narxi majburiy' }).min(0),
+    description: z.string().max(1000).optional(),
     sorting: z.number().int().nullable().optional(),
 });
 
@@ -321,13 +322,14 @@ export function AddProductsDialog({ open, onOpenChange }: AddProductsDialogProps
                                                 <TableHead>Soni</TableHead>
                                                 <TableHead>Haqiqiy narx (so'mda)</TableHead>
                                                 <TableHead>Sotuv narxi (so'mda)</TableHead>
+                                                <TableHead>Tavsif</TableHead>
                                                 <TableHead className="w-[140px]">Amallar</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {isLoadingProducts ? (
                                                 <TableRow>
-                                                    <TableCell colSpan={7} className="text-center py-8">
+                                                    <TableCell colSpan={8} className="text-center py-8">
                                                         <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                                                     </TableCell>
                                                 </TableRow>
@@ -484,6 +486,24 @@ export function AddProductsDialog({ open, onOpenChange }: AddProductsDialogProps
                                                                 />
                                                             </TableCell>
                                                             <TableCell>
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name="description"
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <FormControl>
+                                                                                <Input
+                                                                                    type="text"
+                                                                                    placeholder="Tavsif..."
+                                                                                    className="h-9"
+                                                                                    {...field}
+                                                                                />
+                                                                            </FormControl>
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
                                                                 <div className="flex gap-1">
                                                                     <Button type="submit" size="sm" className="h-9">
                                                                         Saqlash
@@ -505,7 +525,7 @@ export function AddProductsDialog({ open, onOpenChange }: AddProductsDialogProps
                                                     {/* Empty State */}
                                                     {!isAddingNew && !editingProduct && existingProducts.length === 0 && products.length === 0 && (
                                                         <TableRow>
-                                                            <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                                            <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                                                                 {selectedCategory
                                                                     ? 'Mahsulotlar yo\'q. "Mahsulot qo\'shish" tugmasini bosing.'
                                                                     : 'Kategoriyani tanlang va mahsulot qo\'shing.'}
@@ -525,6 +545,9 @@ export function AddProductsDialog({ open, onOpenChange }: AddProductsDialogProps
                                                             <TableCell>{formatPrice(product.real_price)}</TableCell>
                                                             <TableCell className="text-green-600 font-medium">
                                                                 {formatPrice(product.price)}
+                                                            </TableCell>
+                                                            <TableCell className="text-muted-foreground text-sm max-w-[200px] truncate">
+                                                                {product.description || '-'}
                                                             </TableCell>
                                                             <TableCell>
                                                                 <span className="text-xs text-muted-foreground">
@@ -546,6 +569,9 @@ export function AddProductsDialog({ open, onOpenChange }: AddProductsDialogProps
                                                             <TableCell>{formatPrice(product.real_price)}</TableCell>
                                                             <TableCell className="text-green-600 font-medium">
                                                                 {formatPrice(product.price)}
+                                                            </TableCell>
+                                                            <TableCell className="text-muted-foreground text-sm max-w-[200px] truncate">
+                                                                {product.description || '-'}
                                                             </TableCell>
                                                             <TableCell>
                                                                 <div className="flex gap-2">

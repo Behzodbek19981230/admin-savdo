@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/pagination';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
@@ -210,6 +211,7 @@ export default function Products() {
                 real_price: item.real_price || 0,
                 price: item.price || 0,
                 sorting: item.sorting,
+                discription: item.discription || '',
             });
         } else {
             setEditingId(null);
@@ -224,6 +226,7 @@ export default function Products() {
                 real_price: 0,
                 price: 0,
                 sorting: null,
+                discription: '',
             });
         }
         setIsDialogOpen(true);
@@ -247,7 +250,7 @@ export default function Products() {
                 model: data.model,
                 model_type: data.model_type,
                 model_size: data.model_size,
-
+                discription: data.discription,
                 count: data.count,
                 real_price: data.real_price,
                 price: data.price,
@@ -983,6 +986,26 @@ export default function Products() {
                                         )}
                                     />
                                 </div>
+
+                                <FormField
+                                    control={form.control}
+                                    name='discription'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Tavsif</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder='Mahsulot haqida qo&#39;shimcha ma&#39;lumot...'
+                                                    className='resize-none'
+                                                    rows={4}
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormDescription>Mahsulot haqida batafsil ma'lumot (ixtiyoriy)</FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
                             <DialogFooter>
                                 <Button type='button' variant='outline' onClick={handleCloseDialog}>
