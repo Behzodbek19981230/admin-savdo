@@ -55,6 +55,12 @@ export interface ModelSizeDetail {
 	is_delete: boolean;
 }
 
+export interface ProductAttachment {
+	id: number;
+	product: number;
+	file: string;
+}
+
 // Types
 export interface Product {
 	id: number;
@@ -73,6 +79,7 @@ export interface Product {
 	price: number;
 	sorting: number | null;
 	is_delete: boolean;
+	attachments?: ProductAttachment[];
 	created_at?: string;
 	updated_at?: string;
 }
